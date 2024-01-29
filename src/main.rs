@@ -1,6 +1,6 @@
 use std::io::prelude::*;
 use std::io::BufReader;
-use std::io::{self, Write};
+use std::io::{self};
 use std::fs::File;
 use anyhow::{Context, Result};
 use clap::Parser;
@@ -9,6 +9,14 @@ use clap::Parser;
 struct Cli {
     pattern: String,
     path: std::path::PathBuf,
+}
+
+fn find_matches(content: impl Iterator<Item = String>, pattern: &str, mut writer: impl std::io::Write) {
+    for line in content {
+        if line.contains(pattern) {
+            writeln!(writer, "{}", line).unwrap();
+        }
+    }
 }
 
 fn main() -> Result<()> {
@@ -20,12 +28,15 @@ fn main() -> Result<()> {
     let stdout = io::stdout();
     let mut handle = io::BufWriter::new(stdout);
 
-    for line in content {
-        // 文字列リテラルや文字列は、一般的に文字列スライスとして関数に渡され、これによって、実際には所有権を渡す必要がないほとんど場合において柔軟性が増す。
-        if line.contains(&args.pattern) {
-            writeln!(handle, "{}", line)?;
-        }
-    }
+    find_matches(content, &args.pattern, &mut handle);
 
     Ok(())
+}
+
+#[test]
+fn find_a_match() {
+    let mut result = Vec::new();
+    let content = vec![String::from("lorem ipsum"), String::from("dolor sit amet")];
+    find_matches(content.into_iter(), "lorem", &mut result);
+    assert_eq!(result, b"lorem ipsum\n");
 }
