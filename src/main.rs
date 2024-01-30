@@ -4,6 +4,7 @@ use std::io::{self};
 use std::fs::File;
 use anyhow::{Context, Result};
 use clap::Parser;
+use ansi_term::Colour::{Cyan, Black};
 
 #[derive(Parser)]
 struct Cli {
@@ -14,7 +15,18 @@ struct Cli {
 fn find_matches(content: impl Iterator<Item = String>, pattern: &str, mut writer: impl std::io::Write) {
     for line in content {
         if line.contains(pattern) {
-            writeln!(writer, "{}", line).unwrap();
+            let splitted: Vec<&str> = line.split(pattern).collect();
+            for (i, s) in splitted.iter().enumerate() {
+                if i != 0 {
+                    write!(writer, "{}", Black.on(Cyan).paint(pattern)).unwrap();
+                }
+
+                write!(writer, "{}", s).unwrap();
+
+                if i == splitted.len() - 1 {
+                    writeln!(writer).unwrap();
+                }
+            }
         }
     }
 }
