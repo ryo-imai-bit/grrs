@@ -7,13 +7,13 @@ https://rust-cli.github.io/book/index.html
 
 Rust 1.31.0 (or later)
 
-# Additional Features
+## Additional Features
 
 - accept multiple file paths, like original grep
 - highlight matching pattern, like original grep
 
 
-# Usage
+## Usage
 
 ![demo](./demo.gif)
 
