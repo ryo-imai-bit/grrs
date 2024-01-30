@@ -16,3 +16,10 @@ $ cargo run -- stdout src/main.rs
     let stdout = io::stdout();
     let mut handle = io::BufWriter::new(stdout);
 ```
+
+# Additional Features
+
+<!-- q: fix this sentences -->
+<!-- a:  -->
+- accept multiple file paths, like original grep
+- 

@@ -8,7 +8,7 @@ use clap::Parser;
 #[derive(Parser)]
 struct Cli {
     pattern: String,
-    path: std::path::PathBuf,
+    paths: Vec<std::path::PathBuf>,
 }
 
 fn find_matches(content: impl Iterator<Item = String>, pattern: &str, mut writer: impl std::io::Write) {
@@ -21,14 +21,16 @@ fn find_matches(content: impl Iterator<Item = String>, pattern: &str, mut writer
 
 fn main() -> Result<()> {
     let args = Cli::parse();
-    let f = File::open(&args.path).with_context(|| format!("could not read file `{}`", &args.path.display()))?;
-    let reader = BufReader::new(f);
-    let content = reader.lines().map(|l| l.expect("could not parse line"));
+    for path in args.paths {
+        let f = File::open(&path).with_context(|| format!("could not read file `{}`", &path.display()))?;
+        let reader = BufReader::new(f);
+        let content = reader.lines().map(|l| l.expect("could not parse line"));
 
-    let stdout = io::stdout();
-    let mut handle = io::BufWriter::new(stdout);
+        let stdout = io::stdout();
+        let mut handle = io::BufWriter::new(stdout);
 
-    find_matches(content, &args.pattern, &mut handle);
+        find_matches(content, &args.pattern, &mut handle);
+    }
 
     Ok(())
 }
